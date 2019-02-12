@@ -117,9 +117,9 @@ func (p *proxy) call(ctx tp.UnknownCallCtx) (interface{}, *tp.Rerror) {
 		ctx.SetMeta(goutil.BytesToString(key), goutil.BytesToString(value))
 	})
 	rerr := callcmd.Rerror()
-	if rerr != nil && rerr.Code < 200 && rerr.Code > 99 {
-		rerr.Code = tp.CodeBadGateway
-		rerr.Message = tp.CodeText(tp.CodeBadGateway)
+	if rerr != nil && rerr.ErrorCode < 200 && rerr.ErrorCode > 99 {
+		rerr.ErrorCode = tp.CodeBadGateway
+		rerr.ErrorMsg = tp.CodeText(tp.CodeBadGateway)
 	}
 	return result, rerr
 }
@@ -142,9 +142,9 @@ func (p *proxy) push(ctx tp.UnknownPushCtx) *tp.Rerror {
 	}
 	label.Uri = ctx.Uri()
 	rerr := p.pushForwarder(&label).Push(label.Uri, ctx.InputBodyBytes(), settings...)
-	if rerr != nil && rerr.Code < 200 && rerr.Code > 99 {
-		rerr.Code = tp.CodeBadGateway
-		rerr.Message = tp.CodeText(tp.CodeBadGateway)
+	if rerr != nil && rerr.ErrorCode < 200 && rerr.ErrorCode > 99 {
+		rerr.ErrorCode = tp.CodeBadGateway
+		rerr.ErrorMsg = tp.CodeText(tp.CodeBadGateway)
 	}
 	return rerr
 }

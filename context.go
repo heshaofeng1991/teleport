@@ -369,7 +369,7 @@ const logFormatDisconnected = "disconnected due to unsupported message type: %d\
 
 // Be executed asynchronously after readed message
 func (c *handlerCtx) handle() {
-	if c.handleErr != nil && c.handleErr.Code == CodeMtypeNotAllowed {
+	if c.handleErr != nil && c.handleErr.ErrorCode == CodeMtypeNotAllowed {
 		goto E
 	}
 	switch c.input.Mtype() {
@@ -548,7 +548,7 @@ func (c *handlerCtx) handleCall() {
 			c.handleErr = rerr
 		}
 		if rerr != rerrConnClosed {
-			c.writeReply(rerrInternalServerError.Copy().SetReason(rerr.Reason))
+			c.writeReply(rerrInternalServerError.Copy().SetReason(rerr.Data.Reason))
 		}
 		return
 	}

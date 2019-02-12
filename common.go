@@ -132,7 +132,7 @@ func IsConnRerror(rerr *Rerror) bool {
 	if rerr == nil {
 		return false
 	}
-	if rerr.Code == CodeDialFailed || rerr.Code == CodeConnClosed {
+	if rerr.ErrorCode == CodeDialFailed || rerr.ErrorCode == CodeConnClosed {
 		return true
 	}
 	return false

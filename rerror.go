@@ -15,29 +15,36 @@ type (
 	// Rerror error only for reply message
 	Rerror struct {
 		// Code error code
-		Code int32
+		ErrorCode int32
 		// Message the error message displayed to the user (optional)
-		Message string
+		ErrorMsg string
+		// Content
+		Data Content
+	}
+	// Content
+	Content struct {
 		// Reason the cause of the error for debugging (optional)
 		Reason string
 	}
+
 )
 
 var (
 	_ json.Marshaler   = new(Rerror)
 	_ json.Unmarshaler = new(Rerror)
 
-	reA = []byte(`{"code":`)
-	reB = []byte(`,"message":`)
-	reC = []byte(`,"reason":`)
+	reA = []byte(`{"error_code":`)
+	reB = []byte(`,"error_msg":`)
+	reC = []byte(`,"data":{reason:`)
+	reD = []byte(`,"data":{}`)
 )
 
 // NewRerror creates a *Rerror.
 func NewRerror(code int32, message, reason string) *Rerror {
 	return &Rerror{
-		Code:    code,
-		Message: message,
-		Reason:  reason,
+		ErrorCode:    code,
+		ErrorMsg: message,
+		Data:  Content{Reason: reason},
 	}
 }
 
@@ -69,13 +76,13 @@ func (r Rerror) Copy() *Rerror {
 
 // SetMessage sets the error message displayed to the user.
 func (r *Rerror) SetMessage(message string) *Rerror {
-	r.Message = message
+	r.ErrorMsg = message
 	return r
 }
 
 // SetReason sets the cause of the error for debugging.
 func (r *Rerror) SetReason(reason string) *Rerror {
-	r.Reason = reason
+	r.Data.Reason = reason
 	return r
 }
 
@@ -93,14 +100,17 @@ func (r *Rerror) MarshalJSON() ([]byte, error) {
 	if r == nil {
 		return []byte{}, nil
 	}
-	var b = append(reA, strconv.FormatInt(int64(r.Code), 10)...)
-	if len(r.Message) > 0 {
+	var b = append(reA, strconv.FormatInt(int64(r.ErrorCode), 10)...)
+	if len(r.ErrorMsg) > 0 {
 		b = append(b, reB...)
-		b = append(b, utils.ToJsonStr(goutil.StringToBytes(r.Message), false)...)
+		b = append(b, utils.ToJsonStr(goutil.StringToBytes(r.ErrorMsg), false)...)
 	}
-	if len(r.Reason) > 0 {
+	if len(r.Data.Reason) > 0 {
 		b = append(b, reC...)
-		b = append(b, utils.ToJsonStr(goutil.StringToBytes(r.Reason), false)...)
+		b = append(b, utils.ToJsonStr(goutil.StringToBytes(r.Data.Reason), false)...)
+		b = append(b, '}')
+	} else {
+		b = append(b, reD...)
 	}
 	b = append(b, '}')
 	return b, nil
@@ -112,9 +122,9 @@ func (r *Rerror) UnmarshalJSON(b []byte) error {
 		return nil
 	}
 	s := goutil.BytesToString(b)
-	r.Code = int32(gjson.Get(s, "code").Int())
-	r.Message = gjson.Get(s, "message").String()
-	r.Reason = gjson.Get(s, "reason").String()
+	r.ErrorCode = int32(gjson.Get(s, "error_code").Int())
+	r.ErrorMsg = gjson.Get(s, "error_msg").String()
+	r.Data.Reason = gjson.Get(s, "data.reason").String()
 	return nil
 }
 

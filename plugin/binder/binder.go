@@ -661,7 +661,7 @@ func (param *Param) fixRerror(rerr *tp.Rerror) *tp.Rerror {
 		rerr.SetMessage(param.rerrMsg)
 	}
 	if param.rerrCode != 0 {
-		rerr.Code = param.rerrCode
+		rerr.ErrorCode = param.rerrCode
 	}
 	return rerr
 }

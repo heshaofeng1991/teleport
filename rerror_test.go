@@ -10,10 +10,10 @@ import (
 func TestRerror(t *testing.T) {
 	rerr := new(Rerror)
 	t.Logf("%v", rerr)
-	rerr.Code = 400
-	rerr.Message = "msg"
+	rerr.ErrorCode = 400
+	rerr.ErrorMsg = "msg"
 	t.Logf("%v", rerr)
-	rerr.Reason = `"bala...bala..."`
+	rerr.Data.Reason = `"bala...bala..."`
 	t.Logf("%v", rerr)
 	meta := new(utils.Args)
 	rerr.SetToMeta(meta)
